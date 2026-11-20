@@ -102,8 +102,10 @@ interdependence-marl/
 
 ## Quickstart
 
+Requires Python `>=3.10` with **`torch 2.15` (`>=2.15.0,<2.16.0`), `numpy 2.5.5`, and `matplotlib 3.11` (`>=3.11.0,<3.12.0`)**:
+
 ```bash
-pip install -e .
+pip install -e ".[paper,dev]"
 
 # 1. Run full unit-test suite
 python -m unittest discover -s tests -p "test_*.py" -v
