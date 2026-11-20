@@ -1,0 +1,381 @@
+{
+  "ability_combining": {
+    "Homogeneous-SP": {
+      "Symmetric Full-Ability": {
+        "success_rate": 1.0,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.015625,
+        "total_supp_actions": 0.03125,
+        "csi": 0.6521787643432617,
+        "tom_phi_mae": 0.49745347246680094,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair + BLV (Vending)": {
+        "success_rate": 0.28515625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.08984375,
+        "total_supp_actions": 0.09765625,
+        "csi": 0.7809774875640869,
+        "tom_phi_mae": 0.4899673982263172,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair-DHH + Full": {
+        "success_rate": 0.48046875,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.23046875,
+        "total_supp_actions": 0.27734375,
+        "csi": 0.6963030099868774,
+        "tom_phi_mae": 0.47729465646563835,
+        "facilitator_rate": 0.0
+      },
+      "Motor-Ataxia + BLV": {
+        "success_rate": 0.41015625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.10546875,
+        "total_supp_actions": 0.11328125,
+        "csi": 0.7966251969337463,
+        "tom_phi_mae": 0.4117029875153789,
+        "facilitator_rate": 0.0
+      },
+      "LowVision-Tremor + Wheelchair": {
+        "success_rate": 0.18359375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.4375,
+        "total_supp_actions": 0.63671875,
+        "csi": 0.8160679340362549,
+        "tom_phi_mae": 0.3720281472759674,
+        "facilitator_rate": 0.0
+      },
+      "BLV + Wheelchair-DHH (Cross-Modal)": {
+        "success_rate": 0.1328125,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 0.7109375,
+        "total_supp_actions": 0.984375,
+        "csi": 0.7573872208595276,
+        "tom_phi_mae": 0.4799817299325256,
+        "facilitator_rate": 0.0
+      }
+    },
+    "Uniform-DR (No ToM)": {
+      "Symmetric Full-Ability": {
+        "success_rate": 0.890625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 6.98828125,
+        "total_supp_actions": 13.625,
+        "csi": 0.830668568611145,
+        "tom_phi_mae": 0.49486318683256314,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair + BLV (Vending)": {
+        "success_rate": 0.28125,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 8.46484375,
+        "total_supp_actions": 16.89453125,
+        "csi": 0.8657838106155396,
+        "tom_phi_mae": 0.49463092898632155,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair-DHH + Full": {
+        "success_rate": 0.50390625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 13.55859375,
+        "total_supp_actions": 23.62890625,
+        "csi": 0.7876592874526978,
+        "tom_phi_mae": 0.487293153213692,
+        "facilitator_rate": 0.0
+      },
+      "Motor-Ataxia + BLV": {
+        "success_rate": 0.52734375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 8.0625,
+        "total_supp_actions": 16.8359375,
+        "csi": 0.8828657269477844,
+        "tom_phi_mae": 0.414422615257676,
+        "facilitator_rate": 0.0
+      },
+      "LowVision-Tremor + Wheelchair": {
+        "success_rate": 0.36328125,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 10.93359375,
+        "total_supp_actions": 22.40234375,
+        "csi": 0.8443167209625244,
+        "tom_phi_mae": 0.38130575706731884,
+        "facilitator_rate": 0.0
+      },
+      "BLV + Wheelchair-DHH (Cross-Modal)": {
+        "success_rate": 0.25,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 12.29296875,
+        "total_supp_actions": 23.640625,
+        "csi": 0.8274629712104797,
+        "tom_phi_mae": 0.4886494853509166,
+        "facilitator_rate": 0.0
+      }
+    },
+    "ADC-MARL (Ours)": {
+      "Symmetric Full-Ability": {
+        "success_rate": 0.984375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 6.89453125,
+        "total_supp_actions": 12.58203125,
+        "csi": 0.9062648415565491,
+        "tom_phi_mae": 0.33955579144614084,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair + BLV (Vending)": {
+        "success_rate": 0.9765625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 10.08203125,
+        "total_supp_actions": 15.11328125,
+        "csi": 0.8657820820808411,
+        "tom_phi_mae": 0.22670288073557793,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair-DHH + Full": {
+        "success_rate": 0.99609375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 8.2109375,
+        "total_supp_actions": 15.47265625,
+        "csi": 0.9187276363372803,
+        "tom_phi_mae": 0.3876990571016465,
+        "facilitator_rate": 0.0
+      },
+      "Motor-Ataxia + BLV": {
+        "success_rate": 0.99609375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 9.68359375,
+        "total_supp_actions": 14.4296875,
+        "csi": 0.8530206680297852,
+        "tom_phi_mae": 0.15545537771386042,
+        "facilitator_rate": 0.0
+      },
+      "LowVision-Tremor + Wheelchair": {
+        "success_rate": 0.50390625,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 11.5390625,
+        "total_supp_actions": 21.35546875,
+        "csi": 0.9045895934104919,
+        "tom_phi_mae": 0.19161230865757561,
+        "facilitator_rate": 0.0
+      },
+      "BLV + Wheelchair-DHH (Cross-Modal)": {
+        "success_rate": 0.33984375,
+        "consensual_rate": 0.0,
+        "override_rate": 0.0,
+        "borrower_supp_actions": 9.00390625,
+        "total_supp_actions": 21.89453125,
+        "csi": 0.863917350769043,
+        "tom_phi_mae": 0.2919164199515503,
+        "facilitator_rate": 0.0
+      }
+    }
+  },
+  "ability_combining_cross_modal_facilitator": {
+    "none": {
+      "success_rate": 0.3046875,
+      "consensual_rate": 0.0,
+      "override_rate": 0.0,
+      "borrower_supp_actions": 9.27734375,
+      "total_supp_actions": 21.58203125,
+      "csi": 0.8764205574989319,
+      "tom_phi_mae": 0.29078957403884403,
+      "facilitator_rate": 0.0
+    },
+    "always_on": {
+      "success_rate": 0.59765625,
+      "consensual_rate": 0.0,
+      "override_rate": 0.0,
+      "borrower_supp_actions": 9.390625,
+      "total_supp_actions": 16.0546875,
+      "csi": 0.8697028160095215,
+      "tom_phi_mae": 0.39505393207791656,
+      "facilitator_rate": 1.0
+    },
+    "protom": {
+      "success_rate": 0.58203125,
+      "consensual_rate": 0.0,
+      "override_rate": 0.0,
+      "borrower_supp_actions": 8.17578125,
+      "total_supp_actions": 18.09765625,
+      "csi": 0.8802723288536072,
+      "tom_phi_mae": 0.3082888838707783,
+      "facilitator_rate": 0.10933081998114987
+    }
+  },
+  "ability_sharing": {
+    "Task-Only MARL": {
+      "BLV Borrower + Sighted Provider": {
+        "success_rate": 0.7734375,
+        "consensual_rate": 0.4191919267177582,
+        "override_rate": 0.5808081030845642,
+        "borrower_supp_actions": 12.42578125,
+        "total_supp_actions": 21.1640625,
+        "csi": 0.8726951479911804,
+        "tom_phi_mae": 0.26392880952008235,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair Borrower + Ambulatory Provider": {
+        "success_rate": 0.515625,
+        "consensual_rate": 0.007575757801532745,
+        "override_rate": 0.9924242496490479,
+        "borrower_supp_actions": 12.6171875,
+        "total_supp_actions": 24.55078125,
+        "csi": 0.8636988401412964,
+        "tom_phi_mae": 0.30325059569939194,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair-DHH Borrower + Sighted Provider": {
+        "success_rate": 0.4765625,
+        "consensual_rate": 0.04918032884597778,
+        "override_rate": 0.9508196711540222,
+        "borrower_supp_actions": 13.2265625,
+        "total_supp_actions": 25.3828125,
+        "csi": 0.8623068928718567,
+        "tom_phi_mae": 0.3528854135264809,
+        "facilitator_rate": 0.0
+      },
+      "LowVision-Tremor Borrower + Sighted Provider": {
+        "success_rate": 0.87890625,
+        "consensual_rate": 0.5111111402511597,
+        "override_rate": 0.4888888895511627,
+        "borrower_supp_actions": 11.11328125,
+        "total_supp_actions": 19.43359375,
+        "csi": 0.8787739872932434,
+        "tom_phi_mae": 0.23568731721656616,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair Borrower + BLV Provider (PwD->PwD)": {
+        "success_rate": 0.3515625,
+        "consensual_rate": 0.03333333507180214,
+        "override_rate": 0.9666666388511658,
+        "borrower_supp_actions": 11.29296875,
+        "total_supp_actions": 23.7109375,
+        "csi": 0.9079098105430603,
+        "tom_phi_mae": 0.283174594805865,
+        "facilitator_rate": 0.0
+      },
+      "BLV Borrower + DHH Provider (Cross-Modal)": {
+        "success_rate": 0.2890625,
+        "consensual_rate": 0.6891891956329346,
+        "override_rate": 0.31081080436706543,
+        "borrower_supp_actions": 11.30859375,
+        "total_supp_actions": 21.00390625,
+        "csi": 0.8866483569145203,
+        "tom_phi_mae": 0.5008192540568457,
+        "facilitator_rate": 0.0
+      }
+    },
+    "ADC-MARL (Ours)": {
+      "BLV Borrower + Sighted Provider": {
+        "success_rate": 0.96484375,
+        "consensual_rate": 0.9959514141082764,
+        "override_rate": 0.004048583097755909,
+        "borrower_supp_actions": 5.32421875,
+        "total_supp_actions": 10.30859375,
+        "csi": 0.9157506227493286,
+        "tom_phi_mae": 0.2257408948946256,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair Borrower + Ambulatory Provider": {
+        "success_rate": 0.94140625,
+        "consensual_rate": 0.9751037359237671,
+        "override_rate": 0.02489626593887806,
+        "borrower_supp_actions": 3.421875,
+        "total_supp_actions": 8.8359375,
+        "csi": 0.9188310503959656,
+        "tom_phi_mae": 0.3406245821501957,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair-DHH Borrower + Sighted Provider": {
+        "success_rate": 0.9140625,
+        "consensual_rate": 0.9615384340286255,
+        "override_rate": 0.03846153989434242,
+        "borrower_supp_actions": 4.11328125,
+        "total_supp_actions": 10.4296875,
+        "csi": 0.9203914403915405,
+        "tom_phi_mae": 0.36591743823071976,
+        "facilitator_rate": 0.0
+      },
+      "LowVision-Tremor Borrower + Sighted Provider": {
+        "success_rate": 0.9765625,
+        "consensual_rate": 0.984000027179718,
+        "override_rate": 0.01600000075995922,
+        "borrower_supp_actions": 5.05859375,
+        "total_supp_actions": 10.37109375,
+        "csi": 0.9245277643203735,
+        "tom_phi_mae": 0.17150732769420654,
+        "facilitator_rate": 0.0
+      },
+      "Wheelchair Borrower + BLV Provider (PwD->PwD)": {
+        "success_rate": 0.484375,
+        "consensual_rate": 0.9516128897666931,
+        "override_rate": 0.04838709533214569,
+        "borrower_supp_actions": 3.54296875,
+        "total_supp_actions": 10.19921875,
+        "csi": 0.9070909023284912,
+        "tom_phi_mae": 0.2780647959528667,
+        "facilitator_rate": 0.0
+      },
+      "BLV Borrower + DHH Provider (Cross-Modal)": {
+        "success_rate": 0.32421875,
+        "consensual_rate": 0.9879518151283264,
+        "override_rate": 0.012048192322254181,
+        "borrower_supp_actions": 6.5546875,
+        "total_supp_actions": 14.6875,
+        "csi": 0.9028074145317078,
+        "tom_phi_mae": 0.42207548934276845,
+        "facilitator_rate": 0.0
+      }
+    }
+  },
+  "ability_sharing_cross_modal_facilitator": {
+    "none": {
+      "success_rate": 0.296875,
+      "consensual_rate": 1.0,
+      "override_rate": 0.0,
+      "borrower_supp_actions": 6.73046875,
+      "total_supp_actions": 14.72265625,
+      "csi": 0.89356529712677,
+      "tom_phi_mae": 0.42168986712450046,
+      "facilitator_rate": 0.0
+    },
+    "always_on": {
+      "success_rate": 0.7734375,
+      "consensual_rate": 0.9898989796638489,
+      "override_rate": 0.010101010091602802,
+      "borrower_supp_actions": 7.31640625,
+      "total_supp_actions": 16.21875,
+      "csi": 0.9149897694587708,
+      "tom_phi_mae": 0.4752011416349908,
+      "facilitator_rate": 1.0
+    },
+    "protom": {
+      "success_rate": 0.953125,
+      "consensual_rate": 0.9918032884597778,
+      "override_rate": 0.008196720853447914,
+      "borrower_supp_actions": 5.41796875,
+      "total_supp_actions": 11.17578125,
+      "csi": 0.9255324602127075,
+      "tom_phi_mae": 0.4570445775903476,
+      "facilitator_rate": 0.07830286305622629
+    }
+  },
+  "wall_time_sec": 959.67
+}
