@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interdependence-MARL Human-Subject Study Interface</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 960px; margin: 24px auto; padding: 0 16px; color: #1a202c; background: #f8fafc; }
+    h1 { font-size: 1.4rem; margin-bottom: 4px; }
+    .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+    canvas { border: 2px solid #cbd5e1; border-radius: 8px; background: #ffffff; }
+    button, select, input { padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.92rem; cursor: pointer; }
+    button.primary { background: #1b6ca8; color: #fff; border-color: #1b6ca8; font-weight: 600; }
+    .kbd-grid { display: grid; grid-template-columns: repeat(3, 84px); gap: 6px; margin-top: 8px; }
+    .status { font-family: monospace; background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 0.88rem; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Interdependence-MARL: Human-AI Collaborative Study Harness</h1>
+  <p style="margin-top:0;color:#475569;">Supports keyboard navigation, screen-reader ARIA live announcements, and Web Speech TTS cues.</p>
+
+  <div class="panel">
+    <label>Participant ID: <input id="pid" value="P01" style="width:70px" /></label>
+    <label>Mode:
+      <select id="mode">
+        <option value="ability_sharing">Ability Sharing (Guided Shopping)</option>
+        <option value="ability_combining">Ability Combining (Vending Synergy)</option>
+      </select>
+    </label>
+    <label>AI Policy:
+      <select id="condition">
+        <option value="ADC-MARL">ADC-MARL (Interdependence)</option>
+        <option value="Task-Only">Task-Only MARL</option>
+      </select>
+    </label>
+    <label>Human Profile:
+      <select id="hprof">
+        <option value="blv_ambulatory">BLV-Ambulatory (vis=0, reach=1)</option>
+        <option value="wheelchair_sighted">Wheelchair-Sighted (vis=1, reach=0)</option>
+      </select>
+    </label>
+    <button class="primary" onclick="resetTrial()">Start / Reset Trial</button>
+  </div>
+
+  <div class="row">
+    <div class="panel">
+      <canvas id="grid" width="350" height="350" aria-label="5 by 5 collaborative workspace"></canvas>
+      <div id="aria-live" aria-live="polite" class="status" style="margin-top:10px;">Ready.</div>
+    </div>
+
+    <div class="panel" style="flex:1; min-width: 300px;">
+      <div><strong>Target Visual Code:</strong> <span id="goal-badge" class="badge">?</span></div>
+      <p style="font-size:0.88rem;color:#475569;">1. Choose optional Supportive Signal (utterance/gesture):
+        <select id="supp">
+          <option value="0">Silent (0)</option>
+          <option value="1">Vocal Code/Station 0</option>
+          <option value="2">Vocal Code/Station 1</option>
+          <option value="3">Vocal Code/Station 2</option>
+          <option value="4">Visual Gesture 0</option>
+          <option value="5">Visual Gesture 1</option>
+          <option value="6">Visual Gesture 2</option>
+        </select>
+      </p>
+      <p style="font-size:0.88rem;color:#475569;">2. Execute Physical Action (or Arrow Keys / Space):</p>
+      <div class="kbd-grid">
+        <div></div><button onclick="stepAct(1)">Up</button><div></div>
+        <button onclick="stepAct(3)">Left</button><button onclick="stepAct(0)">Stay</button><button onclick="stepAct(4)">Right</button>
+        <div></div><button onclick="stepAct(2)">Down</button><button class="primary" onclick="stepAct(5)">Interact</button>
+      </div>
+      <hr style="margin:16px 0;border:none;border-top:1px solid #e2e8f0;" />
+      <div><strong>AI Theory-of-Mind Estimate of Your Profile [vis, aud, reach, motor]:</strong></div>
+      <div id="tom-readout" class="status" style="margin-top:6px;">[0.5, 0.5, 0.5, 0.5]</div>
+
+      <div id="survey-box" style="display:none; margin-top:14px; border-top:2px solid #1b6ca8; padding-top:10px;">
+        <strong>Post-Trial Ratings (1 = Low, 7 = High)</strong><br/>
+        <label>Sense of Agency: <input type="number" id="r_agency" min="1" max="7" value="6" style="width:50px"/></label>
+        <label>NASA-TLX Effort: <input type="number" id="r_tlx" min="1" max="7" value="2" style="width:50px"/></label>
+        <label>Fluency: <input type="number" id="r_fluency" min="1" max="7" value="6" style="width:50px"/></label>
+        <button class="primary" onclick="submitSurvey()">Save Trial Log</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPP_LABELS = ["silent", "vocal:0", "vocal:1", "vocal:2", "gest:0", "gest:1", "gest:2"];
+    async function resetTrial() {
+      document.getElementById("survey-box").style.display = "none";
+      const res = await fetch("/reset", {
+        method: "POST",
+        body: JSON.stringify({
+          mode: document.getElementById("mode").value,
+          condition: document.getElementById("condition").value,
+          human_profile: document.getElementById("hprof").value,
+          ai_profile: document.getElementById("hprof").value === "wheelchair_sighted" ? "blv_ambulatory" : "full_ability",
+          facilitator: "protom"
+        })
+      });
+      render(await res.json());
+    }
+    async function stepAct(req) {
+      const supp = parseInt(document.getElementById("supp").value, 10);
+      const res = await fetch("/step", { method: "POST", body: JSON.stringify({ req, supp }) });
+      document.getElementById("supp").value = "0";
+      render(await res.json());
+    }
+    async function submitSurvey() {
+      await fetch("/survey", {
+        method: "POST",
+        body: JSON.stringify({
+          participant_id: document.getElementById("pid").value,
+          agency_rating: document.getElementById("r_agency").value,
+          tlx_effort: document.getElementById("r_tlx").value,
+          fluency_rating: document.getElementById("r_fluency").value
+        })
+      });
+      document.getElementById("aria-live").textContent = "Saved trial log to results/human_study_logs/trials.csv.";
+    }
+    function render(st) {
+      document.getElementById("goal-badge").textContent = st.goal_code;
+      document.getElementById("tom-readout").textContent = JSON.stringify(st.ai_inferred_human_phi);
+      const msg = `Step ${st.step}/${st.max_steps} | You@${JSON.stringify(st.human_pos)} | AI@${JSON.stringify(st.ai_pos)} (${SUPP_LABELS[st.ai_last_supp]}) | Held=${st.held_by}`;
+      document.getElementById("aria-live").textContent = st.done ? `${msg} | DONE: ${JSON.stringify(st.info)}` : msg;
+      if (st.done) document.getElementById("survey-box").style.display = "block";
+
+      const cv = document.getElementById("grid"), ctx = cv.getContext("2d"), cell = 70;
+      ctx.clearRect(0, 0, 350, 350);
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
+        ctx.strokeStyle = "#e2e8f0"; ctx.strokeRect(c * cell, r * cell, cell, cell);
+      }
+      // Checkout
+      ctx.fillStyle = "#dcfce7"; ctx.fillRect(2 * cell + 4, 2 * cell + 4, cell - 8, cell - 8);
+      ctx.fillStyle = "#166534"; ctx.font = "11px sans-serif"; ctx.fillText("CHECKOUT", 2 * cell + 7, 2 * cell + 38);
+      // Stations
+      st.stations.forEach((s, idx) => {
+        const [r, c] = s.pos;
+        ctx.fillStyle = "#fef3c7"; ctx.fillRect(c * cell + 4, r * cell + 4, cell - 8, cell - 8);
+        ctx.fillStyle = "#92400e"; ctx.fillText(`S${idx} [v=${s.vis_code}]`, c * cell + 8, r * cell + 24);
+      });
+      // Human (Blue) & AI (Orange)
+      ctx.fillStyle = "#1b6ca8"; ctx.beginPath(); ctx.arc(st.human_pos[1]*cell + 24, st.human_pos[0]*cell + 46, 13, 0, 6.28); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.fillText("H", st.human_pos[1]*cell + 20, st.human_pos[0]*cell + 50);
+      ctx.fillStyle = "#e68a2e"; ctx.beginPath(); ctx.arc(st.ai_pos[1]*cell + 48, st.ai_pos[0]*cell + 46, 13, 0, 6.28); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.fillText("AI", st.ai_pos[1]*cell + 42, st.ai_pos[0]*cell + 50);
+    }
+    window.addEventListener("keydown", (e) => {
+      const map = { ArrowUp: 1, ArrowDown: 2, ArrowLeft: 3, ArrowRight: 4, " ": 5 };
+      if (map[e.key] !== undefined) { e.preventDefault(); stepAct(map[e.key]); }
+    });
+    resetTrial();
+  </script>
+</body>
+</html>

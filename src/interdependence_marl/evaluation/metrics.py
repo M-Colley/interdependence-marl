@@ -33,6 +33,7 @@ def evaluate_dyad(
     facilitator_mode: str = "none",
     deterministic: bool = False,
     seed: int = 1000,
+    env_cls: type = AbilityDiversePOSG,
     device: torch.device | str = "cpu",
 ) -> dict[str, float]:
     """Evaluate a trained model on `num_episodes` parallel rollouts for a specific ability dyad."""
@@ -40,7 +41,7 @@ def evaluate_dyad(
     dev = torch.device(device)
     model.eval()
 
-    env = AbilityDiversePOSG(num_envs=num_episodes, config=env_cfg, device=dev)
+    env = env_cls(num_envs=num_episodes, config=env_cfg, device=dev)
     phi = make_dyad_batch(key_0, key_1, batch_size=num_episodes, device=dev)
     obs, state = env.reset(phi=phi)
 
@@ -124,6 +125,7 @@ def evaluate_suite(
     env_cfg: EnvConfig,
     facilitator_mode: str = "none",
     num_episodes: int = 256,
+    env_cls: type = AbilityDiversePOSG,
     device: torch.device | str = "cpu",
 ) -> dict[str, dict[str, float]]:
     """Evaluate across all canonical seen & unseen ability dyads for the configured mode."""
@@ -140,6 +142,7 @@ def evaluate_suite(
             num_episodes=num_episodes,
             facilitator_mode=facilitator_mode,
             seed=2000 + idx * 17,
+            env_cls=env_cls,
             device=device,
         )
     return results

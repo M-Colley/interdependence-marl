@@ -88,6 +88,9 @@ class AbilityDiversePOSG:
         self.ep_req_moves = torch.zeros((num_envs, 2), dtype=torch.float32, device=self.device)
         self.ep_supp_count = torch.zeros((num_envs, 2), dtype=torch.float32, device=self.device)
         self.supp_cost_scale: float = 1.0
+        self.dynamic_supp_cost_borrower: float | None = None
+        self.dynamic_override_penalty: float | None = None
+        self.dynamic_agency_bonus: float | None = None
 
     def reset(
         self,
@@ -200,14 +203,15 @@ class AbilityDiversePOSG:
         consensual_checkout = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
         unilateral_override = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
 
-        # Supportive effort costs (scaled by curriculum warmup factor `supp_cost_scale`)
+        # Supportive effort costs (scaled by curriculum warmup or Primal-Dual multiplier)
         if self.cfg.mode == "ability_sharing":
             if self.cfg.interdependence_reward:
-                reward -= (
-                    self.supp_cost_scale
-                    * self.cfg.supp_cost_borrower
-                    * (a_supp[:, 0] > 0).float()
+                b_cost = (
+                    self.dynamic_supp_cost_borrower
+                    if self.dynamic_supp_cost_borrower is not None
+                    else self.supp_cost_scale * self.cfg.supp_cost_borrower
                 )
+                reward -= b_cost * (a_supp[:, 0] > 0).float()
                 reward -= (
                     self.supp_cost_scale
                     * self.cfg.supp_cost_provider
@@ -289,8 +293,18 @@ class AbilityDiversePOSG:
                 unilateral_override = unilateral_override | is_unilat
 
                 if self.cfg.interdependence_reward:
-                    reward = torch.where(is_cons, reward + self.cfg.agency_bonus, reward)
-                    reward = torch.where(is_unilat, reward - self.cfg.override_penalty, reward)
+                    ag_bon = (
+                        self.dynamic_agency_bonus
+                        if self.dynamic_agency_bonus is not None
+                        else self.cfg.agency_bonus
+                    )
+                    ov_pen = (
+                        self.dynamic_override_penalty
+                        if self.dynamic_override_penalty is not None
+                        else self.cfg.override_penalty
+                    )
+                    reward = torch.where(is_cons, reward + ag_bon, reward)
+                    reward = torch.where(is_unilat, reward - ov_pen, reward)
 
         # Potential-based shaping on non-terminal transitions
         phi_next = self._potential()

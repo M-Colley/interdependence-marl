@@ -88,9 +88,9 @@ def extract_egocentric_features(obs: torch.Tensor) -> torch.Tensor:
     # Per-station visual match (strictly 0 when vis_codes == 0, e.g., BLV agent)
     vis_match = (vis_codes * code_cue.unsqueeze(-2)).sum(dim=-1)  # (..., 3)
 
-    return torch.cat(
+    base_ego = torch.cat(
         [
-            obs,                                 # 42
+            obs[..., :42],                       # 42
             delta_st.reshape(*lead, 6),          # 6
             at_st,                               # 3
             delta_co,                            # 2
@@ -99,7 +99,10 @@ def extract_egocentric_features(obs: torch.Tensor) -> torch.Tensor:
             vis_match,                           # 3
         ],
         dim=-1,
-    )  # total: 59 dims
+    )  # 59 dims
+    if obs.shape[-1] > 42:
+        return torch.cat([base_ego, obs[..., 42:]], dim=-1)
+    return base_ego
 
 
 class InterdependentCTDENet(nn.Module):
@@ -120,7 +123,9 @@ class InterdependentCTDENet(nn.Module):
         self.use_tom = use_tom
         self.use_grounding = use_grounding
 
-        ego_dim = 59
+        extra_obs_dim = max(0, obs_dim - 42)
+        self.extra_obs_dim = extra_obs_dim
+        ego_dim = 59 + extra_obs_dim
         in_dim = ego_dim + NUM_REQ_ACTIONS + NUM_SUPP_ACTIONS
         self.obs_encoder = nn.Sequential(
             nn.Linear(in_dim, hidden_dim),
@@ -148,8 +153,8 @@ class InterdependentCTDENet(nn.Module):
         self.attn_head = nn.Linear(hidden_dim, NUM_STATIONS)
         self.ground_proj = nn.Linear(hidden_dim, 32)
 
-        # Policy receives recurrent state + egocentric station/checkout geometry + ToM features
-        geom_dim = 6 + 3 + 2 + 1 + 4  # delta_st(6), at_st(3), delta_co(2), at_co(1), own_phi(4)
+        # Policy receives recurrent state + egocentric station/checkout/extra geometry + ToM
+        geom_dim = 6 + 3 + 2 + 1 + 4 + extra_obs_dim
         policy_in_dim = hidden_dim + geom_dim + (ABILITY_DIM + NUM_STATIONS + NUM_STATIONS if use_tom else 0)
         self.policy_trunk = nn.Sequential(
             nn.Linear(policy_in_dim, hidden_dim),
@@ -191,9 +196,12 @@ class InterdependentCTDENet(nn.Module):
         attn_probs = F.softmax(self.attn_head(h_flat), dim=-1)
         ground_emb = F.normalize(self.ground_proj(h_flat), dim=-1)
 
-        # Direct skip of egocentric geometry + own_phi so auxiliary losses never erase navigation
+        # Direct skip of egocentric geometry + own_phi (+ extra domain features if any)
         own_phi = ego_flat[:, 4:8]
-        geom = torch.cat([ego_flat[:, 42:54], own_phi], dim=-1)  # 12 + 4 = 16 dims
+        parts = [ego_flat[:, 42:54], own_phi]
+        if self.extra_obs_dim > 0:
+            parts.append(ego_flat[:, 59 : 59 + self.extra_obs_dim])
+        geom = torch.cat(parts, dim=-1)
 
         if self.use_tom:
             pol_in = torch.cat(

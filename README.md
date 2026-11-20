@@ -1,73 +1,67 @@
-# Interdependence-MARL: Ability-Diverse Collaboration via Multi-Agent Reinforcement Learning
+# Interdependence-MARL: Agency-Preserving Coordination Across Asymmetric Sensorimotor Capabilities
 
-Operationalizing **Interdependence Theory** ([Bennett et al., ASSETS '18](https://doi.org/10.1145/3234695.3236348)) and the **Ability-Diverse Collaboration (ADC) Framework** ([Xiao et al., CHI '24](https://doi.org/10.1145/3613904.3641930)) inside a formal **Multi-Agent Reinforcement Learning (MARL)** paradigm, integrating computational Theory of Mind, cross-modal referential grounding, and Unsupervised Partner Design inspired by Prof. Andreas Bulling's Collaborative AI group (2024–2026).
-
----
-
-## Overview & Motivation
-
-Standard cooperative MARL assumes symmetric observation spaces, homogeneous action spaces, and a single task-completion scalar reward. As shown by Xiao et al. (CHI '24), ability-diverse human–human and human–AI collaborations violate all three assumptions:
-1. **Asymmetric Sensory & Motor Capabilities:** Collaborators possess distinct perceptual channels and physical/cognitive envelopes ($\phi_i \in [0, 1]^d$).
-2. **Active Supportive ("Invisible") Work:** Even when a goal belongs to one collaborator (*Ability Sharing*), the *Ability Borrower* is **not** a passive recipient of care—they actively deploy *Supportive Abilities* ($a_i^{\text{supp}}$) to build common ground and steer the *Required Ability* ($a_j^{\text{req}}$).
-3. **Agency vs. Paternalistic Override:** Optimizing task return alone incentivizes capable agents to unilaterally take over tasks (*paternalistic override*) or force impaired partners to expend excessive communicative effort (*invisible work*).
-
-This repository formalizes and trains **ADC-MARL** inside a fast, batched PyTorch **Ability-Parameterized Partially Observable Stochastic Game (A-POSG)** covering both ADC collaboration topologies (**Ability Combining** and **Ability Sharing**) and assistive **Communication Supporters**.
+Operationalizing **Interdependence Theory** ([Bennett et al., ASSETS '18](https://doi.org/10.1145/3234695.3236348)) and the **Ability-Diverse Collaboration (ADC) Framework** ([Xiao et al., CHI '24](https://doi.org/10.1145/3613904.3641930)) inside a formal **Constrained Multi-Agent Reinforcement Learning (CA-POSG)** paradigm, integrating computational Theory of Mind, cross-modal referential grounding, and Unsupervised Partner Design inspired by Prof. Andreas Bulling's Collaborative AI group (2024–2026).
 
 ---
 
-## Mathematical Formalization
+## Key Contributions
 
-We define an **Ability-Parameterized POSG**:
-
-$$\mathcal{M} = \left\langle \mathcal{N}, \mathcal{S}, \{\phi_i\}_{i \in \mathcal{N}}, \left\{\mathcal{A}_i^{\text{req}} \times \mathcal{A}_i^{\text{supp}}\right\}_{i \in \mathcal{N}}, \{\Omega_i, O_i(\cdot \mid \phi_i)\}_{i \in \mathcal{N}}, T(\cdot \mid \{\phi_i\}), \{R_i\}_{i \in \mathcal{N}}, \gamma \right\rangle$$
-
-* **Continuous Ability Profiles ($\phi_i \in [0, 1]^4$):** Rather than binary deficit flags (following Ability-Based Design; Wobbrock et al., 2011; Nolte et al., 2022), each agent has continuous `[vis, aud, reach, motor]` capabilities governing visual label perception, auditory/vocal perception, elevated dispenser actuation, and motor execution slip/tremor (`1 - motor`, following Charaja, ..., Bulling, et al., BioRob '24).
-* **Dual-Head Action Space:** Each agent outputs $a_i = (a_i^{\text{req}}, a_i^{\text{supp}})$, separating physical domain actions (`STAY, UP, DOWN, LEFT, RIGHT, INTERACT`) from multimodal epistemic/grounding actions (`silent`, `vocal:0..2`, `gest:0..2`).
-* **Online Theory-of-Mind Capability & Belief Inference** *(inspired by MToMnet, Bortoletto, Ruhdorfer, Shi, & Bulling, ECAI '24)*: Partner profiles $\phi_{-i}$ are **strictly hidden** at execution time; a decentralized recurrent encoder infers $(\hat{\phi}_{-i}^t, \hat{b}_i^t)$ online from interaction history $\tau_i^t$.
-* **Collapse-Free Cross-Modal Grounding & Epistemic Common-Ground Potential** *(inspired by MATE, Benintendi, Ruhdorfer, Kögel, & Bulling, '26)*: Grounds latent station attention across sensory modalities and shapes common-ground formation via a policy-invariant telescoping potential $\Delta \Phi_{\text{bel}}(t) = \gamma \Phi_{\text{bel}}(t+1) - \Phi_{\text{bel}}(t)$.
-* **Ability-Conditioned Unsupervised Partner Design (`Ability-UPD`)** *(extending Ruhdorfer, Bortoletto, Oei, Penzkofer, & Bulling, ICML '26)*: Dynamically curates continuous asymmetric ability dyads $(\phi_0, \phi_1) \in \Phi^2$ and stochastic policy-mixing weights prioritized by GAE advantage variance (the agent's learnability frontier).
-* **ProToM-Style Communication Supporter** *(extending Bortoletto et al., Findings of ACL '26 & Xiao et al., Fig. 7d)*: Selectively translates vocal $\leftrightarrow$ visual/caption symbols across orthogonal sensory chasms (e.g., Blind-Hearing + Deaf-Sighted) **only** when inter-agent Jensen-Shannon belief divergence exceeds a threshold.
+1. **Constrained Ability-Parameterized POSG (`CA-POSG`) & Formal Theory** ([docs/theory_and_proofs.md](docs/theory_and_proofs.md)):
+   * Replaces binary disability flags with continuous capability vectors $\phi_i = (\text{vis}, \text{aud}, \text{reach}, \text{motor}) \in [0, 1]^4$ and decomposes actions into **Required Abilities** ($a_i^{\text{req}}$) and **Supportive ("Invisible Work") Abilities** ($a_i^{\text{supp}}$).
+   * Proves an **Information-Reachability Interdependence Bound** (Proposition 1), **Policy Invariance & $O(1)$ Credit Assignment of Telescoping Epistemic Common-Ground Shaping** (Proposition 2), and **Zero Duality Gap for Primal-Dual Agency-Constrained Sharing** (Proposition 3).
+2. **Primal-Dual Lagrangian & Information-Theoretic Empowerment** ([lagrangian.py](src/interdependence_marl/training/lagrangian.py), [empowerment.py](src/interdependence_marl/evaluation/empowerment.py)):
+   * Automatically tunes Lagrange multipliers $(\nu_{\text{override}}, \nu_{\text{burden}}, \nu_{\text{emp}})$ to satisfy target upper bounds on paternalistic override ($\tau_{\text{override}} = 5\%$) and communicative burden, evaluated via exact counterfactual discrete mutual information $I(A_0; S' \mid s)$, Barber-Agakov variational empowerment $I_q(A_u; S_{t+k} \mid S_t)$, and **Counterfactual Shapley Values**.
+3. **Three-Tier Benchmark Suite & Rigorous `rliable` Evaluation**:
+   * **Tier 1 (`AbilityDiversePOSG`):** Controlled diagnostic suite for *Ability Combining*, *Ability Sharing*, and `ProToM` cross-modal facilitation, evaluated with stratified bootstrap 95% CIs and Interquartile Mean (**IQM**, Agarwal et al., NeurIPS '21) against **Fictitious Co-Play (`FCP`)** and component ablations.
+   * **Tier 2 (`OvercookedV2-Ability`):** Procedural 3-stage cooperative kitchen (`Elevated Pantry -> Procedural Cooking Pot -> Serving Window`, inspired by Bulling's *Overcooked Generalisation Challenge*, TMLR '25).
+   * **Tier 3 (`ContinuousBiomechanicalEnv`):** Continuous 2D musculoskeletal reaching under 5 Hz Parkinsonian/ataxic tremor, range-of-motion saturation, and ambiguous dining-table gaze distractors (inspired by Bulling's *iAssistADL* & *BioRob '24*).
+4. **Human-Subject Study Design & Live Web Study Harness** ([docs/human_study_design.md](docs/human_study_design.md), [study_app/](study_app/)):
+   * Complete two-phase experimental & participatory protocol ($N = 36$ Williams Latin-Square mixed-factorial study + $N = 12$ BLV/DHH/mobility-impaired co-design evaluation) with an accessible HTML5/ARIA/Web-Speech study app connected directly to the trained PyTorch checkpoints.
 
 ---
 
-## Empirical Results
+## Empirical Results Across All 3 Tiers
 
-### 1. Ability Combining: Zero-Shot Cross-Ability Generalization
+### Tier 1: Multi-Seed Ablations (`rliable` IQM), `FCP` Comparison & Primal-Dual Saddle Dynamics
 
-![Ability Combining Results](results/figures/ability_combining_results.png)
+![Tier 1 Ablations and Primal-Dual Lagrangian](results/figures/tier1_ablations_and_lagrangian.png)
 
-In the canonical **Wheelchair-Sighted + BLV-Ambulatory** vending-machine scenario (Bennett et al., 2018), neither collaborator can solve the task solo (`Wheelchair` has `0%` solo reach on elevated dispensers; `BLV` has `<= 33.3%` blind-guessing ceiling):
+Across 4 asymmetric dyads $\times$ 3 seeds (`rliable` stratified bootstrap 95% CIs), every component of `ADC-MARL` contributes monotonically, achieving $P(\text{ADC-MARL} > \text{FCP}) = 1.000$ and positive counterfactual Shapley synergy (`+0.309` vs. `-0.027` for `Homogeneous-SP`):
 
-| Method | Full + Full | Wheelchair + BLV | Wheelchair-DHH + Full | Motor-Ataxia + BLV | LowVis-Tremor + Wheelchair |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Homogeneous Self-Play** | **100.0%** | 28.5% | 48.0% | 41.0% | 18.4% |
-| **Uniform-DR (No ToM)** | 89.1% | 28.1% | 50.4% | 52.7% | 36.3% |
-| **ADC-MARL (Ours)** | **98.4%** | **97.7%** | **99.6%** | **99.6%** | **50.4%** |
+| Method | Asymmetric Zero-Shot IQM (%) | 95% Stratified Bootstrap CI |
+| :--- | :---: | :---: |
+| **Homogeneous Self-Play** | 34.7% | `[32.6%, 37.1%]` |
+| **FCP (Population Co-Play, Strouse et al. '21)** | 8.0% | `[5.6%, 10.9%]` |
+| **ADC-MARL (`-Ability-UPD` / Uniform)** | 43.8% | `[39.0%, 48.7%]` |
+| **ADC-MARL (`-Online ToM`)** | 46.3% | `[43.4%, 49.5%]` |
+| **ADC-MARL (`-Epistemic Potential`)** | 62.7% | `[52.7%, 69.1%]` |
+| **`ADC-MARL` (Full)** | **78.5%** | **`[62.2%, 86.1%]`** |
 
-### 2. Ability Sharing: Preserving Borrower Agency & Reducing "Invisible Work"
-
+![Ability Combining & ProToM](results/figures/ability_combining_results.png)
 ![Ability Sharing Agency & Invisible Work](results/figures/ability_sharing_agency.png)
 
-When goal ownership belongs privately to the **Ability Borrower**, standard task-only MARL learns high rates of **paternalistic unilateral checkout override** (up to `99.2%`) and forces Borrowers to spam supportive utterances (`>12` actions/episode). Optimizing the **Interdependence Objective** increases task completion while eliminating unilateral overrides and halving Borrower communicative burden:
+In **Ability Sharing**, **Primal-Dual `ADC-MARL`** automatically drives unilateral paternalistic overrides down onto the target $\tau_{\text{override}} = 5\%$ constraint (`5.2%` on BLV and `3.2%` on Wheelchair Borrowers, and `0.4%` with fixed Lagrangian weights, vs. `46.7%–99.2%` in `Task-Only MARL`), halves Borrower invisible work (`7.75` vs. `15.14` acts/ep), and increases counterfactual Borrower Empowerment (`1.464` nats vs. `1.343` nats). On orthogonal cross-modal dyads (`BLV Borrower + DHH-Sighted Provider`), **`ProToM` reaches `95.3%` success at only `7.8%` relay load** (vs. `29.7%` unmediated and `100%` load for `Always-On`).
 
-| Ability-Sharing Dyad | Metric | Task-Only MARL | ADC-MARL (Ours) |
-| :--- | :--- | :---: | :---: |
-| **BLV Borrower $\to$ Sighted Provider** | Success Rate | 77.3% | **96.5%** |
-| | Unilateral Override Rate $\downarrow$ | 58.1% | **0.4%** |
-| | Borrower Invisible Work (acts/ep) $\downarrow$ | 12.43 | **5.32** |
-| **Wheelchair Borrower $\to$ Ambulatory Provider** | Success Rate | 51.6% | **94.1%** |
-| | Unilateral Override Rate $\downarrow$ | 99.2% | **2.5%** |
-| | Borrower Invisible Work (acts/ep) $\downarrow$ | 12.62 | **3.42** |
-| **Wheelchair-DHH Borrower $\to$ Sighted Provider** | Success Rate | 47.7% | **91.4%** |
-| | Unilateral Override Rate $\downarrow$ | 95.1% | **3.8%** |
-| | Borrower Invisible Work (acts/ep) $\downarrow$ | 13.23 | **4.11** |
+---
 
-### 3. Bridging Orthogonal Sensory Modalities via `ProToM` Facilitator
+### Tier 2: Procedural `OvercookedV2-Ability` Multi-Stage Cooperative Kitchen
 
-On the **BLV Borrower + DHH-Sighted Provider** dyad (Xiao et al., Sec. 5.3.2—where direct vocal and visual channels have zero overlap):
-* **No Facilitator (`none`):** `29.7%` task success (`0.0%` relay load)
-* **Unfiltered Broadcast (`always_on`):** `77.3%` task success (`100.0%` notification load)
-* **`ProToM` Selective Facilitator (`protom`):** **`95.3%` task success at only `7.8%` relay load** ($12.8\times$ lower alert burden)
+![Tier 2 OvercookedV2-Ability](results/figures/tier2_overcooked_ability.png)
+
+| Method | Full + Full Chefs | Wheelchair + BLV | Wheelchair-DHH + Full | Motor-Ataxia + BLV | LowVis-Tremor + Wheelchair |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Homogeneous Self-Play** | **98.0%** | 11.7% | 43.4% | 34.4% | 10.9% |
+| **FCP (Co-Play)** | 1.2% | 2.0% | 2.0% | 2.3% | 2.0% |
+| **Uniform-DR** | 76.6% | 23.4% | 53.1% | 44.1% | 29.3% |
+| **`ADC-MARL` (Ours)** | **95.7%** | **77.7%** | **94.9%** | **92.2%** | **88.7%** |
+
+---
+
+### Tier 3: Continuous 2D Musculoskeletal Tremor & Empowerment-Constrained Shared Control
+
+![Tier 3 Biomechanical Shared Control](results/figures/tier3_biomechanical_empowerment.png)
+
+Under 5 Hz pathological tremor, ROM saturation, and 30% ambiguous dining-table gaze distractors, `Unassisted` reaching fails (`0.0%` stabilization), while `ADC-Lagrangian Assist` outperforms `Task-Only Shared Autonomy` on target stabilization (`50.0%` vs. `40.6%`, final error `0.161` vs. `0.202`) using **30% lower assistive force magnitude** (`0.184` vs. `0.265`) at an interior empowerment dual $\nu_{\text{emp}} = 0.244$.
 
 ---
 
@@ -75,42 +69,52 @@ On the **BLV Borrower + DHH-Sighted Provider** dyad (Xiao et al., Sec. 5.3.2—w
 
 ```text
 interdependence-marl/
+├── docs/
+│   ├── theory_and_proofs.md       # Formal CA-POSG definitions & Propositions 1-3 proofs
+│   └── human_study_design.md      # Pre-registration-grade N=36 + N=12 human study protocol
+├── study_app/
+│   ├── server.py                  # Live Python HTTP backend running trained PyTorch models
+│   └── index.html                 # Accessible HTML5/ARIA/keyboard Human-AI study UI
 ├── src/interdependence_marl/
-│   ├── profiles.py            # Continuous 4D ability space & canonical dyads
-│   ├── envs/adc_posg.py       # Vectorized PyTorch Ability-Parameterized POSG
-│   ├── models/networks.py     # Egocentric CTDE GRU + Online ToM + Cross-Modal Grounding
-│   ├── models/facilitator.py  # ProToM-inspired JSD-gated Communication Supporter
-│   ├── training/upd.py        # Ability-Conditioned Unsupervised Partner Design (Ability-UPD)
-│   ├── training/mappo.py      # Decoupled Recurrent CTDE MAPPO trainer
-│   └── evaluation/metrics.py  # Zero-shot interdependence, CSI, override & agency metrics
+│   ├── profiles.py                # Continuous 4D ability space & canonical dyads
+│   ├── envs/
+│   │   ├── adc_posg.py            # Tier 1: Vectorized Ability-Parameterized POSG
+│   │   ├── overcooked_ability.py  # Tier 2: Procedural 3-stage OvercookedV2-Ability kitchen
+│   │   └── continuous_assistive.py# Tier 3: Continuous 2D biomechanical tremor & shared control
+│   ├── models/
+│   │   ├── networks.py            # Egocentric CTDE GRU + Online ToM + Cross-Modal Grounding
+│   │   └── facilitator.py         # ProToM-inspired JSD-gated Communication Supporter
+│   ├── training/
+│   │   ├── upd.py                 # Ability-Conditioned Unsupervised Partner Design (Ability-UPD)
+│   │   ├── lagrangian.py          # Primal-Dual Lagrangian multiplier controller
+│   │   └── mappo.py               # Decoupled Recurrent CTDE MAPPO + FCP co-play trainer
+│   └── evaluation/
+│       ├── metrics.py             # Zero-shot interdependence, CSI, override & agency metrics
+│       ├── empowerment.py         # Discrete & Variational Empowerment + Shapley values
+│       └── rliable_stats.py       # Stratified Bootstrap 95% CIs, IQM & P(X > Y)
 ├── scripts/
-│   ├── train_and_evaluate.py  # Reproduces all benchmarks, ablations, JSON logs, and plots
-│   └── demo_rollout.py        # Prints step-by-step interpretable agent & ToM traces
-├── tests/test_adc_marl.py     # Unit tests for sensory masking, supermodularity, ProToM & UPD
-└── results/                   # Saved metrics JSON and publication figures
+│   ├── train_and_evaluate.py      # Fast core Tier 1 training & ProToM evaluation
+│   ├── run_enhanced_paper_suite.py# Full 3-tier multi-seed ablations, FCP, Shapley & plots
+│   └── demo_rollout.py            # Step-by-step interpretable agent & ToM traces
+├── tests/test_adc_marl.py         # 7-suite unit tests across Tiers 1-3, Shapley & Primal-Dual
+└── results/                       # Logged JSON metrics and publication figures
 ```
 
 ## Quickstart
 
 ```bash
-# Install in editable mode (requires Python >= 3.10, PyTorch, NumPy, Matplotlib)
 pip install -e .
 
-# Run unit tests
+# 1. Run full unit-test suite
 python -m unittest discover -s tests -p "test_*.py" -v
 
-# Reproduce full training & ablation benchmarks + figures
+# 2. Reproduce Tier 1 core benchmarks & rollout traces
 python scripts/train_and_evaluate.py
-
-# Inspect step-by-step rollout traces & online partner capability inference
 python scripts/demo_rollout.py
+
+# 3. Reproduce full 3-tier multi-seed paper suite (FCP, Primal-Dual, Shapley, Overcooked, Biomech)
+python scripts/run_enhanced_paper_suite.py
+
+# 4. Launch interactive Human-AI Study App in browser
+python study_app/server.py --port 8765
 ```
-
-## Key References
-
-* **Xiao et al. (CHI '24):** *A Systematic Review of Ability-diverse Collaboration through Ability-based Lens in HCI.*
-* **Bennett et al. (ASSETS '18):** *Interdependence as a Frame for Assistive Technology Research and Design.*
-* **Ruhdorfer, Bortoletto, Oei, Penzkofer, & Bulling (ICML '26):** *Unsupervised Partner Design Enables Robust Ad-hoc Teamwork.*
-* **Bortoletto, Ruhdorfer, Shi, & Bulling (ECAI '24):** *Explicit Modelling of Theory of Mind for Belief Prediction in Nonverbal Social Interactions (MToMnet).*
-* **Bortoletto et al. (Findings of ACL '26):** *ProToM: Promoting Prosocial Behaviour via Theory of Mind-Informed Feedback.*
-* **Benintendi, Ruhdorfer, Kögel, & Bulling ('26):** *Grounded Joint-Attention Other-Play for Zero-Shot Coordination (MATE).*

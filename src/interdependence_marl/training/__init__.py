@@ -1,6 +1,13 @@
-"""Training algorithms and curriculum design for Interdependence-MARL."""
+"""Training algorithms, Primal-Dual Lagrangian optimization, and Ability-UPD curriculum."""
 
+from interdependence_marl.training.lagrangian import LagrangianConfig, PrimalDualController
 from interdependence_marl.training.mappo import TrainConfig, train_interdependent_mappo
 from interdependence_marl.training.upd import AbilityUPD
 
-__all__ = ["AbilityUPD", "TrainConfig", "train_interdependent_mappo"]
+__all__ = [
+    "AbilityUPD",
+    "LagrangianConfig",
+    "PrimalDualController",
+    "TrainConfig",
+    "train_interdependent_mappo",
+]
